@@ -1,5 +1,4 @@
 from django.db import models
-from typing import Optional
 
 class Posts(models.Model):
     title = models.CharField(max_length=100)
