@@ -1,20 +1,20 @@
+from ninja import Router
 from django.shortcuts import get_object_or_404
-from ninja import NinjaAPI
 from typing import List
 from datetime import date
 
 from .schemas import PostSchemaIn, NotFoundSchema, PostSchemaOut, UpdatePostSchema
 from .models import Posts
 
-api = NinjaAPI()
+router = Router()
 
 
-@api.get("/test")
+@router.get("/test")
 def test(request):
     return {"message": "aoabaaa"}
 
 
-@api.post("/create-post")
+@router.post("/create-post")
 def create_post(request, payload: PostSchemaIn):
     payload.date = date.today()
     post = Posts.objects.create(**payload.dict())
@@ -28,19 +28,19 @@ def create_post(request, payload: PostSchemaIn):
     return {"post": post_data}
 
 
-@api.get("/post/{post_id}", response=PostSchemaOut)
+@router.get("/{post_id}", response=PostSchemaOut)
 def get_post(request, post_id: int):
     post = get_object_or_404(Posts, id=post_id)
     return post
 
 
-@api.get("/posts", response=List[PostSchemaOut])
+@router.get("/all_posts", response=List[PostSchemaOut])
 def posts(request):
     posts = Posts.objects.all()
     return posts
 
 
-@api.patch("/update_post/{post_id}")
+@router.patch("/update_post/{post_id}")
 def update_post(request, post_id: int, payload: UpdatePostSchema):
     post = get_object_or_404(Posts, id=post_id)
     for attr, value in payload.dict(exclude_unset=True).items():
@@ -49,7 +49,7 @@ def update_post(request, post_id: int, payload: UpdatePostSchema):
     return {"success": "post updated successfully"}
 
 
-@api.delete("/delete_post/{post_id}")
+@router.delete("/delete_post/{post_id}")
 def delete_post(request, post_id: int):
     post = get_object_or_404(Posts, id=post_id)
     post.delete()
