@@ -40,10 +40,10 @@ def posts(request):
     return posts
 
 
-@api.put("/update_post/{post_id}")
-def update_post(request, post_id: int, payload: PostSchemaIn):
+@api.patch("/update_post/{post_id}")
+def update_post(request, post_id: int, payload: UpdatePostSchema):
     post = get_object_or_404(Posts, id=post_id)
-    for attr, value in payload.dict().items():
+    for attr, value in payload.dict(exclude_unset=True).items():
         setattr(post, attr, value)
     post.save()
     return {"success": "post updated successfully"}
